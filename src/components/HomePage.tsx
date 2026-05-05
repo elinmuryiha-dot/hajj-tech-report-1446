@@ -6,11 +6,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as Icons from 'lucide-react';
-import { 
-  ChevronRight, 
-  Menu, 
+import {
+  ChevronRight,
+  Menu,
   X,
-  MapPin, 
+  MapPin,
   Activity,
   CheckCircle2,
   Users,
@@ -42,7 +42,7 @@ const systems = [
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  
+
   // Dynamic State
   const [settings, setSettings] = useState<GlobalSettings>(adminStore.getSettings());
   const [stats, setStats] = useState<Stat[]>([]);
@@ -124,7 +124,7 @@ export default function HomePage() {
               <p className="text-[10px] text-slate-500 font-bold leading-tight">إدارة الاتصالات وتقنية المعلومات</p>
             </div>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-8 text-sm font-medium">
             <a href="#hero" className="hover:text-brand-gold transition-colors">الرئيسية</a>
             <a href="#units" className="hover:text-brand-gold transition-colors">الوحدات الميدانية</a>
@@ -142,7 +142,7 @@ export default function HomePage() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -168,7 +168,7 @@ export default function HomePage() {
           </div>
 
           <div className="container mx-auto px-6 text-center lg:text-right flex flex-col lg:flex-row items-center justify-between gap-12">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -176,14 +176,14 @@ export default function HomePage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-gold/10 text-brand-gold rounded-full text-xs font-bold mb-6">
                 <Zap size={14} />
-                <span>خطة موسم حج 1446-2026</span>
+                <span>خطة موسم حج 1447-2026</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-6">
                 الخطة الفنية <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-l from-brand-blue to-brand-blue/80">للتجهيزات التقنية</span>
               </h2>
               <p className="text-lg text-slate-600 max-w-xl mb-10 leading-relaxed mx-auto lg:mx-0">
-                تسهم التكنولوجيا بدور محوري في تنظيم وتعزيز موسم الحج من خلال توفير المعلومات في الوقت الفعلي، وتيسير عمليات الاتصال، ورفع مستويات الأمان والسلامة، وبفضلها يمكن تحقيق تجربة حج أكثر سلاسة وشمولية لجميع المشاركين في أداء المناسك. 
+                تسهم التكنولوجيا بدور محوري في تنظيم وتعزيز موسم الحج من خلال توفير المعلومات في الوقت الفعلي، وتيسير عمليات الاتصال، ورفع مستويات الأمان والسلامة، وبفضلها يمكن تحقيق تجربة حج أكثر سلاسة وشمولية لجميع المشاركين في أداء المناسك.
                 <br /><br />
                 وتحرص إدارة الاتصالات وتقنية المعلومات خلال الموسم على تحديث وتركيب وربط وتفعيل الأنظمة المختلفة، بما يضمن انسيابية العمليات وسرعة تحقيق الأهداف لخدمة ضيوف الرحمن على الوجه الأمثل.
               </p>
@@ -195,16 +195,16 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 1 }}
               className="lg:w-1/2 relative"
             >
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl shadow-brand-blue/10 border-4 border-white">
-                <img 
-                  src={settings.heroImageUrl || "hajj_hero.jpg"} 
-                  alt="Hajj Holy Site" 
+                <img
+                  src={settings.heroImageUrl || "hajj_hero.jpg"}
+                  alt="Hajj Holy Site"
                   className="w-full aspect-[4/3] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -213,7 +213,7 @@ export default function HomePage() {
                   <p className="text-xl font-bold">المشاعر المقدسة 1446</p>
                 </div>
               </div>
-              <motion.div 
+              <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl z-20 hidden md:block"
@@ -316,7 +316,7 @@ export default function HomePage() {
               <h3 className="text-4xl md:text-5xl font-black mb-6 text-slate-900 leading-tight">جميع الوحدات الميدانية</h3>
               <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">تجهيزات موسعة في المواقع لضمان التشغيل الكامل خلال الموسم في المشاعر المقدسة.</p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {units.map((unit, unitIdx) => (
                 <motion.div
@@ -335,10 +335,10 @@ export default function HomePage() {
                       وحدة ميدانية
                     </span>
                   </div>
-                  
+
                   <h4 className="text-2xl font-black text-slate-900 mb-4">{unit.name}</h4>
                   <p className="text-slate-600 mb-8 flex-grow leading-relaxed">{unit.description}</p>
-                  
+
                   <div className="space-y-3 pt-6 border-t border-slate-50">
                     {unit.details.map((detail, idx) => (
                       <div key={idx} className="flex items-center gap-3 text-sm font-medium text-slate-700">
@@ -364,7 +364,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 md:gap-10">
               {stats.map((stat, idx) => (
-                <motion.div 
+                <motion.div
                   key={stat.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -391,7 +391,7 @@ export default function HomePage() {
                 توثيق مرئي لأعمال إدارة الاتصالات وتقنية المعلومات الميدانية (تجهيز المواقع الميدانية)
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {gallery.map((item, idx) => (
                 <motion.div
@@ -402,9 +402,9 @@ export default function HomePage() {
                   className="group bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100"
                 >
                   <div className="relative aspect-video overflow-hidden">
-                    <img 
-                      src={item.url} 
-                      alt={item.title} 
+                    <img
+                      src={item.url}
+                      alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
@@ -424,7 +424,7 @@ export default function HomePage() {
         {/* Systems Section */}
         <section id="systems" className="py-24 bg-brand-blue text-white overflow-hidden relative">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-gold/10 rounded-full blur-[120px] -z-0"></div>
-          
+
           <div className="container mx-auto px-6 relative z-10">
             <div className="flex flex-col lg:flex-row items-center gap-16">
               <div className="lg:w-1/2">
@@ -441,23 +441,23 @@ export default function HomePage() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="lg:w-1/2 relative">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4 pt-12">
                     <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center p-8">
-                       <Server className="w-full h-full text-brand-gold opacity-60" />
+                      <Server className="w-full h-full text-brand-gold opacity-60" />
                     </div>
                     <div className="aspect-[4/3] bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center p-8">
-                        <Users className="w-full h-full text-brand-gold opacity-60" />
+                      <Users className="w-full h-full text-brand-gold opacity-60" />
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div className="aspect-[4/3] bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center p-8">
-                         <Wifi className="w-full h-full text-brand-gold opacity-60" />
+                      <Wifi className="w-full h-full text-brand-gold opacity-60" />
                     </div>
                     <div className="aspect-square bg-white/5 rounded-3xl border border-white/10 flex items-center justify-center p-8">
-                         <ShieldCheck className="w-full h-full text-brand-gold opacity-60" />
+                      <ShieldCheck className="w-full h-full text-brand-gold opacity-60" />
                     </div>
                   </div>
                 </div>
