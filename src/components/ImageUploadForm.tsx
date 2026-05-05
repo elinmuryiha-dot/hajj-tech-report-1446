@@ -16,6 +16,7 @@ export default function ImageUploadForm({ image, onSave, onCancel }: ImageUpload
   const [preview, setPreview] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (image) {
@@ -51,31 +52,68 @@ export default function ImageUploadForm({ image, onSave, onCancel }: ImageUpload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // For demo purposes, we'll create a data URL
-      // In production, you'd upload to a server
+      setSelectedFile(file);
+      
+      // Create a local preview
       const reader = new FileReader();
       reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        handleUrlChange(dataUrl);
+        setPreview(event.target?.result as string);
       };
       reader.readAsDataURL(file);
+      setError('');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    
+    // We need either a selected file or an existing URL
+    if (!selectedFile && !url.trim()) {
+      setError('يرجى إدخال رابط الصورة أو اختيار ملف للتحميل');
+      return;
+    }
+    
+    if (!title.trim()) {
+      setError('يرجى إدخال عنوان الصورة');
+      return;
+    }
+    if (!description.trim()) {
+      setError('يرجى إدخال وصف الصورة');
+      return;
+    }
 
     setIsLoading(true);
     try {
-      // Save to Firebase
+      let finalUrl = url;
+
+      // Upload file to Firebase Storage if a new file is selected
+      if (selectedFile) {
+        try {
+          const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+          // Import app to ensure storage is initialized properly
+          const { default: app } = await import('../firebaseConfig');
+          
+          const storage = getStorage(app);
+          const fileExtension = selectedFile.name.split('.').pop();
+          const fileName = `images/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
+          const storageRef = ref(storage, fileName);
+          
+          const snapshot = await uploadBytes(storageRef, selectedFile);
+          finalUrl = await getDownloadURL(snapshot.ref);
+        } catch (storageError: any) {
+          console.error('Storage Error:', storageError);
+          throw new Error(`فشل في رفع الصورة إلى Storage: ${storageError.message}. تأكد من تفعيل Storage في Firebase.`);
+        }
+      }
+
+      // Save to Firestore
       if (image?.id) {
         const { updateImageData } = await import('../firebaseImageService');
-        await updateImageData(image.id, title, description, url);
+        await updateImageData(image.id, title, description, finalUrl);
       } else {
-        await uploadImageData(title, description, url);
+        await uploadImageData(title, description, finalUrl);
       }
-      onSave(title, description, url);
+      onSave(title, description, finalUrl);
     } catch (err: any) {
       console.error('Firebase Save Error:', err);
       if (err.message?.includes('size')) {
