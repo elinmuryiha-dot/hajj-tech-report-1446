@@ -209,8 +209,7 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div className="absolute bottom-8 right-8 text-white text-right">
-                  <p className="text-sm opacity-80 mb-1">تجهيزات متكاملة</p>
-                  <p className="text-xl font-bold">المشاعر المقدسة 1446</p>
+
                 </div>
               </div>
               <motion.div
