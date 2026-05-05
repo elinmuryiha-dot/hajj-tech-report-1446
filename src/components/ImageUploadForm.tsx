@@ -16,7 +16,6 @@ export default function ImageUploadForm({ image, onSave, onCancel }: ImageUpload
   const [preview, setPreview] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (image) {
@@ -52,68 +51,63 @@ export default function ImageUploadForm({ image, onSave, onCancel }: ImageUpload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
-      
-      // Create a local preview
       const reader = new FileReader();
       reader.onload = (event) => {
-        setPreview(event.target?.result as string);
+        const dataUrl = event.target?.result as string;
+        
+        // Compress image using canvas to ensure it fits in Firestore
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            // Compress to JPEG with 0.7 quality
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            handleUrlChange(compressedDataUrl);
+          } else {
+            handleUrlChange(dataUrl);
+          }
+        };
+        img.src = dataUrl;
       };
       reader.readAsDataURL(file);
-      setError('');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // We need either a selected file or an existing URL
-    if (!selectedFile && !url.trim()) {
-      setError('يرجى إدخال رابط الصورة أو اختيار ملف للتحميل');
-      return;
-    }
-    
-    if (!title.trim()) {
-      setError('يرجى إدخال عنوان الصورة');
-      return;
-    }
-    if (!description.trim()) {
-      setError('يرجى إدخال وصف الصورة');
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
     try {
-      let finalUrl = url;
-
-      // Upload file to Firebase Storage if a new file is selected
-      if (selectedFile) {
-        try {
-          const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-          // Import app to ensure storage is initialized properly
-          const { default: app } = await import('../firebaseConfig');
-          
-          const storage = getStorage(app);
-          const fileExtension = selectedFile.name.split('.').pop();
-          const fileName = `images/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-          const storageRef = ref(storage, fileName);
-          
-          const snapshot = await uploadBytes(storageRef, selectedFile);
-          finalUrl = await getDownloadURL(snapshot.ref);
-        } catch (storageError: any) {
-          console.error('Storage Error:', storageError);
-          throw new Error(`فشل في رفع الصورة إلى Storage: ${storageError.message}. تأكد من تفعيل Storage في Firebase.`);
-        }
-      }
-
-      // Save to Firestore
+      // Save to Firestore directly
       if (image?.id) {
         const { updateImageData } = await import('../firebaseImageService');
-        await updateImageData(image.id, title, description, finalUrl);
+        await updateImageData(image.id, title, description, url);
       } else {
-        await uploadImageData(title, description, finalUrl);
+        await uploadImageData(title, description, url);
       }
-      onSave(title, description, finalUrl);
+      onSave(title, description, url);
     } catch (err: any) {
       console.error('Firebase Save Error:', err);
       if (err.message?.includes('size')) {
