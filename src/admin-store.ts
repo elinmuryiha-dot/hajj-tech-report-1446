@@ -16,6 +16,13 @@ export interface GlobalSettings {
   heroImageUrl: string;
 }
 
+export interface Operation {
+  id: string;
+  title: string;
+  description: string;
+  order?: number;
+}
+
 export interface Stat {
   id: string;
   label: string;
@@ -160,12 +167,19 @@ const DEFAULT_IMAGES: Image[] = [
   }
 ];
 
+const DEFAULT_OPERATIONS: Operation[] = [
+  { id: 'op-1', title: 'تجهيز البنية التحتية', description: 'تم الانتهاء من تجهيز البنية التحتية لجميع المواقع وتمديد شبكات الألياف الضوئية.', order: 1 },
+  { id: 'op-2', title: 'تفعيل الأنظمة الأمنية', description: 'تفعيل جميع الأنظمة الأمنية والدوائر التلفزيونية المغلقة وربطها بمركز القيادة والسيطرة.', order: 2 },
+  { id: 'op-3', title: 'تشغيل شبكات الاتصال', description: 'تشغيل أنظمة الاتصال اللاسلكي وتوزيع الأجهزة على كافة الفرق الميدانية.', order: 3 },
+];
+
 class AdminStore {
   private images: Image[] = [];
   private settings: GlobalSettings = { ...DEFAULT_SETTINGS };
   private stats: Stat[] = [];
   private units: Unit[] = [];
   private orgUnits: OrgUnit[] = [];
+  private operations: Operation[] = [];
   private credentials = { username: DEFAULT_USERNAME, password: DEFAULT_PASSWORD };
 
   constructor() {
@@ -207,6 +221,13 @@ class AdminStore {
     } else {
       this.orgUnits = [...DEFAULT_ORG_UNITS];
     }
+
+    const storedOperations = localStorage.getItem('admin-operations');
+    if (storedOperations) {
+      this.operations = JSON.parse(storedOperations);
+    } else {
+      this.operations = [...DEFAULT_OPERATIONS];
+    }
     
     const storedCredentials = localStorage.getItem('admin-credentials');
     if (storedCredentials) {
@@ -222,6 +243,7 @@ class AdminStore {
     localStorage.setItem('admin-stats', JSON.stringify(this.stats));
     localStorage.setItem('admin-units', JSON.stringify(this.units));
     localStorage.setItem('admin-org-units', JSON.stringify(this.orgUnits));
+    localStorage.setItem('admin-operations', JSON.stringify(this.operations));
     localStorage.setItem('admin-credentials', JSON.stringify(this.credentials));
   }
 
@@ -389,6 +411,45 @@ class AdminStore {
     const index = this.orgUnits.findIndex(u => u.id === id);
     if (index !== -1) {
       this.orgUnits.splice(index, 1);
+      this.saveToLocalStorage();
+      return true;
+    }
+    return false;
+  }
+
+  // Operations
+  getAllOperations(): Operation[] {
+    return [...this.operations].sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  addOperation(title: string, description: string): Operation {
+    const maxOrder = this.operations.reduce((max, op) => Math.max(max, op.order || 0), 0);
+    const newOperation: Operation = {
+      id: Date.now().toString(),
+      title,
+      description,
+      order: maxOrder + 1,
+    };
+    this.operations.push(newOperation);
+    this.saveToLocalStorage();
+    return newOperation;
+  }
+
+  updateOperation(id: string, title: string, description: string): Operation | null {
+    const op = this.operations.find(o => o.id === id);
+    if (op) {
+      op.title = title;
+      op.description = description;
+      this.saveToLocalStorage();
+      return op;
+    }
+    return null;
+  }
+
+  deleteOperation(id: string): boolean {
+    const index = this.operations.findIndex(o => o.id === id);
+    if (index !== -1) {
+      this.operations.splice(index, 1);
       this.saveToLocalStorage();
       return true;
     }

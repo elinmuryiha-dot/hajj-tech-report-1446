@@ -21,13 +21,14 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { adminStore, GlobalSettings, Stat, Unit, Image, OrgUnit } from '../admin-store';
+import { adminStore, GlobalSettings, Stat, Unit, Image, OrgUnit, Operation } from '../admin-store';
 import {
   fetchAllImages,
   fetchAllStats,
   fetchAllUnits,
   fetchAllOrgUnits,
   fetchSettings,
+  fetchAllOperations,
 } from '../firebaseService';
 
 const systems = [
@@ -49,6 +50,7 @@ export default function HomePage() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [gallery, setGallery] = useState<Image[]>([]);
   const [orgUnits, setOrgUnits] = useState<OrgUnit[]>([]);
+  const [operations, setOperations] = useState<Operation[]>([]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -57,12 +59,13 @@ export default function HomePage() {
     // Load all data from Firebase with localStorage fallback
     const loadData = async () => {
       try {
-        const [fbSettings, fbStats, fbUnits, fbOrgUnits, fbImages] = await Promise.allSettled([
+        const [fbSettings, fbStats, fbUnits, fbOrgUnits, fbImages, fbOps] = await Promise.allSettled([
           fetchSettings(),
           fetchAllStats(),
           fetchAllUnits(),
           fetchAllOrgUnits(),
           fetchAllImages(),
+          fetchAllOperations(),
         ]);
 
         if (fbSettings.status === 'fulfilled' && fbSettings.value) {
@@ -92,12 +95,19 @@ export default function HomePage() {
         if (fbImages.status === 'fulfilled' && fbImages.value.length > 0) {
           setGallery(fbImages.value as Image[]);
         }
+
+        if (fbOps.status === 'fulfilled' && fbOps.value.length > 0) {
+          setOperations(fbOps.value.sort((a, b) => (a.order || 0) - (b.order || 0)));
+        } else {
+          setOperations(adminStore.getAllOperations());
+        }
       } catch (err) {
         console.error('Error loading data from Firebase, using local fallback:', err);
         setSettings(adminStore.getSettings());
         setStats(adminStore.getAllStats());
         setUnits(adminStore.getAllUnits());
         setOrgUnits(adminStore.getAllOrgUnits());
+        setOperations(adminStore.getAllOperations());
       }
     };
 
@@ -381,6 +391,38 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Operations Section */}
+        {operations.length > 0 && (
+          <section id="operations" className="py-24 bg-slate-50 border-t border-slate-200">
+            <div className="container mx-auto px-6">
+              <div className="text-center mb-16">
+                <h3 className="text-4xl md:text-5xl font-black mb-6 text-slate-900 leading-tight">أبرز العمليات</h3>
+                <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">أهم الإنجازات والأعمال التقنية المنفذة لخدمة ضيوف الرحمن</p>
+              </div>
+              <div className="max-w-4xl mx-auto">
+                <div className="space-y-6">
+                  {operations.map((op, idx) => (
+                    <motion.div
+                      key={op.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      viewport={{ once: true }}
+                      className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex gap-6 hover:shadow-md hover:border-brand-blue/30 transition-all group relative overflow-hidden"
+                    >
+                      <div className="absolute left-0 top-0 bottom-0 w-2 bg-brand-blue/10 group-hover:bg-brand-blue transition-colors"></div>
+                      <div className="flex-1">
+                        <h4 className="text-2xl font-black text-slate-900 mb-3">{op.title}</h4>
+                        <p className="text-slate-600 leading-relaxed text-lg">{op.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Gallery Section */}
         <section id="gallery" className="py-24 bg-slate-50 border-t border-slate-200">

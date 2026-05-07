@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Settings, Activity, MapPin, Images, GitBranch } from 'lucide-react';
+import { LogOut, LayoutDashboard, Settings, Activity, MapPin, Images, GitBranch, Target } from 'lucide-react';
 import SettingsManager from './SettingsManager';
 import StatsManager from './StatsManager';
 import UnitsManager from './UnitsManager';
 import OrgChartManager from './OrgChartManager';
+import OperationsManager from './OperationsManager';
 import ImageCard from './ImageCard';
 import ImageUploadForm from './ImageUploadForm';
 import { adminStore, Image } from '../admin-store';
 import { fetchAllImages, uploadImageData, updateImageData, deleteImageData } from '../firebaseService';
 import { AlertCircle, Trash2, Plus } from 'lucide-react';
 
-type Tab = 'dashboard' | 'images' | 'stats' | 'units' | 'orgchart' | 'settings';
+type Tab = 'dashboard' | 'images' | 'stats' | 'units' | 'orgchart' | 'operations' | 'settings';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -107,6 +108,9 @@ export default function AdminDashboard() {
           <button onClick={() => setActiveTab('orgchart')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'orgchart' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
             <GitBranch className="w-5 h-5" /> الهيكل التنظيمي
           </button>
+          <button onClick={() => setActiveTab('operations')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'operations' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+            <Target className="w-5 h-5" /> أبرز العمليات
+          </button>
           <button onClick={() => setActiveTab('settings')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'settings' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
             <Settings className="w-5 h-5" /> إعدادات الموقع
           </button>
@@ -135,6 +139,7 @@ export default function AdminDashboard() {
              <button onClick={() => setActiveTab('stats')} className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold ${activeTab === 'stats' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>أرقام التشغيل</button>
              <button onClick={() => setActiveTab('units')} className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold ${activeTab === 'units' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>الوحدات الميدانية</button>
              <button onClick={() => setActiveTab('orgchart')} className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold ${activeTab === 'orgchart' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>الهيكل التنظيمي</button>
+             <button onClick={() => setActiveTab('operations')} className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold ${activeTab === 'operations' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>أبرز العمليات</button>
              <button onClick={() => setActiveTab('settings')} className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold ${activeTab === 'settings' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>إعدادات الموقع</button>
           </div>
 
@@ -150,6 +155,7 @@ export default function AdminDashboard() {
           {activeTab === 'stats' && <StatsManager showSuccess={showSuccess} />}
           {activeTab === 'units' && <UnitsManager showSuccess={showSuccess} />}
           {activeTab === 'orgchart' && <OrgChartManager showSuccess={showSuccess} />}
+          {activeTab === 'operations' && <OperationsManager showSuccess={showSuccess} />}
           {activeTab === 'images' && (
             <div>
                <div className="mb-8 flex items-center justify-between">

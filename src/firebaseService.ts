@@ -15,7 +15,7 @@ import {
   QuerySnapshot,
 } from 'firebase/firestore';
 import app from './firebaseConfig';
-import type { Stat, Unit, OrgUnit, GlobalSettings } from './admin-store';
+import type { Stat, Unit, OrgUnit, GlobalSettings, Operation } from './admin-store';
 
 const db = getFirestore(app);
 
@@ -129,6 +129,34 @@ export async function updateOrgUnitData(id: string, data: Partial<OrgUnit>): Pro
 
 export async function deleteOrgUnitData(id: string): Promise<void> {
   const docRef = doc(db, 'orgUnits', id);
+  await deleteDoc(docRef);
+}
+
+// ==================== OPERATIONS ====================
+const operationsCollection = collection(db, 'operations');
+
+export async function fetchAllOperations(): Promise<Operation[]> {
+  const snapshot = await getDocs(operationsCollection);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Operation));
+}
+
+export async function addOperationData(operation: Omit<Operation, 'id'>): Promise<string> {
+  const docRef = await addDoc(operationsCollection, {
+    title: operation.title,
+    description: operation.description,
+    order: operation.order || 0,
+  });
+  return docRef.id;
+}
+
+export async function updateOperationData(id: string, data: Partial<Operation>): Promise<void> {
+  const docRef = doc(db, 'operations', id);
+  const { id: _, ...updateData } = data as any;
+  await updateDoc(docRef, updateData);
+}
+
+export async function deleteOperationData(id: string): Promise<void> {
+  const docRef = doc(db, 'operations', id);
   await deleteDoc(docRef);
 }
 
