@@ -470,13 +470,11 @@ export default function HomePage() {
       <footer className="bg-brand-blue py-12 text-center text-white">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <img src={settings.logoUrl || "logo.png"} alt="Logo" className="w-10 h-10 object-contain invert brightness-0 grayscale" style={{ filter: 'invert(1) brightness(100%)' }} />
             <div className="text-right border-r border-white/20 pr-4">
               <span className="font-bold block text-lg leading-tight uppercase">الأدلة الجنائية</span>
               <span className="text-[10px] block text-white/50 font-bold">إدارة الاتصالات وتقنية المعلومات</span>
             </div>
           </div>
-          <p className="text-white/60 text-sm font-bold">جميع الحقوق محفوظة لصالح إيلين القحطاني</p>
         </div>
       </footer>
     </div>
